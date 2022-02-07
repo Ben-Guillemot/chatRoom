@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 // import './chat.scss';
 
@@ -20,8 +20,15 @@ const Chat = ({
             };
 
             await socket.emit("send_message", messageData);
+            setCurrentMessage('');
         }
     }
+
+    useEffect(() => {
+        socket.on("receive_message", (data) => {
+            console.log(data);
+        });
+    }, [socket]);
 
    return (
         <div>
