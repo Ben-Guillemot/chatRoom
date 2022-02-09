@@ -9,6 +9,7 @@ const Chat = ({
 }) => {
 
     const [currentMessage, setCurrentMessage] = useState("");
+    const [messageList, setMessageList] = useState([]);
 
     const sendMessage = async () => {
         if (currentMessage !== "") {
@@ -20,22 +21,26 @@ const Chat = ({
             };
 
             await socket.emit("send_message", messageData);
-            setCurrentMessage('');
+            setMessageList((list) => [...list, messageData]);
         }
     }
 
     useEffect(() => {
         socket.on("receive_message", (data) => {
-            console.log(data);
+            setMessageList((list) => [...list, data]);
         });
     }, [socket]);
 
    return (
-        <div>
+        <div className="chat-window">
             <div className="chat-header">
                 <p>Live Chat</p>
             </div>
-            <div className="chat-body"></div>
+            <div className="chat-body">
+                {messageList.map((messageContent) => {
+                    return <h1 key={messageContent.message}>{messageContent.message}</h1>
+                })}
+            </div>
             <div className="chat-footer">
                 <input type="text" placeholder="Hey..." 
                 onChange={(event) => {
@@ -49,9 +54,9 @@ const Chat = ({
 };
 
 Chat.propTypes = {
-    socket: PropTypes.func.isRequired,
+    socket: PropTypes.shape().isRequired,
     username: PropTypes.string.isRequired,
-    room: PropTypes.number.isRequired,
+    room: PropTypes.string.isRequired,
 };
 Chat.defaultProps = {
 };
